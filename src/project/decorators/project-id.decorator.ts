@@ -1,15 +1,23 @@
-import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import {
+  createParamDecorator,
+  ExecutionContext,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { FastifyRequest } from 'fastify';
 import { ProjectDto } from '../dto';
 
-export const ProjectId = createParamDecorator((_, ctx: ExecutionContext) => {
-  const request = ctx.switchToHttp().getRequest<
-    FastifyRequest & {
-      user: {
-        project: ProjectDto;
-      };
-    }
-  >();
+type Request = FastifyRequest & {
+  user?: {
+    project?: Pick<ProjectDto, 'id'>;
+  };
+};
 
-  return request.user.project.id;
+export const ProjectId = createParamDecorator((_, ctx: ExecutionContext) => {
+  const request = ctx.switchToHttp().getRequest<Request>();
+
+  if (request.user?.project) {
+    return request.user.project.id;
+  }
+
+  throw new UnauthorizedException();
 });
