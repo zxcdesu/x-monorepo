@@ -13,6 +13,7 @@ export class ProjectUserService {
       },
       include: {
         user: true,
+        roles: true,
       },
     });
   }

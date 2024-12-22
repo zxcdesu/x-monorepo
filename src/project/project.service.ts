@@ -12,6 +12,12 @@ export class ProjectService {
         users: {
           create: {
             userId,
+            roles: {
+              create: {
+                name: data.name,
+                default: true,
+              },
+            },
           },
         },
         ...data,

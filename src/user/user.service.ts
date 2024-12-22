@@ -1,14 +1,21 @@
 import { Injectable } from '@nestjs/common';
+import { CryptoService } from 'src/common/crypto';
 import { PrismaService } from 'src/common/prisma';
 import { CreateUserDto, UpdateUserDto, UserDto } from './dto';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly cryptoService: CryptoService,
+  ) {}
 
-  create(data: CreateUserDto): Promise<UserDto> {
+  async create(data: CreateUserDto): Promise<UserDto> {
     return this.prismaService.user.create({
-      data,
+      data: {
+        ...data,
+        password: await this.cryptoService.hash(data.password),
+      },
     });
   }
 
