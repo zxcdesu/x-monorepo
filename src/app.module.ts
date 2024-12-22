@@ -4,6 +4,8 @@ import Joi from 'joi';
 import { AuthModule } from './auth';
 import { RateLimitModule } from './common/rate-limit';
 import { ReportModule } from './common/report';
+import { ProjectModule } from './project';
+import { ProjectUserModule } from './project-user';
 import { UserModule } from './user';
 
 @Module({
@@ -19,6 +21,8 @@ import { UserModule } from './user';
     AuthModule,
     RateLimitModule.forRoot({}),
     ReportModule.forRoot({}),
+    ProjectModule,
+    ProjectUserModule,
     UserModule,
   ],
 })

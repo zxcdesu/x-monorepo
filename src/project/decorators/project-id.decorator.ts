@@ -1,13 +1,15 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { FastifyRequest } from 'fastify';
-import { UserDto } from '../dto';
+import { ProjectDto } from '../dto';
 
-export const UserId = createParamDecorator((_, ctx: ExecutionContext) => {
+export const ProjectId = createParamDecorator((_, ctx: ExecutionContext) => {
   const request = ctx.switchToHttp().getRequest<
     FastifyRequest & {
-      user: UserDto;
+      user: {
+        project: ProjectDto;
+      };
     }
   >();
 
-  return request.user.id;
+  return request.user.project.id;
 });

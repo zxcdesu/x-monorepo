@@ -50,10 +50,10 @@ export class UserController {
   }
 
   @Delete('@me')
+  @UseGuards(AuthGuard)
   @SerializeOptions({
     type: UserDto,
   })
-  @UseGuards(AuthGuard)
   remove(@UserId() userId: number): Promise<UserDto> {
     return this.userService.remove(userId);
   }

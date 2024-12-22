@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { CryptoModule } from 'src/common/crypto';
 import { PrismaModule } from 'src/common/prisma';
-import { UserController } from './user.controller';
-import { UserService } from './user.service';
+import { ProjectController } from './project.controller';
+import { ProjectService } from './project.service';
 
 @Module({
   imports: [
@@ -14,10 +13,9 @@ import { UserService } from './user.service';
         secret: configService.getOrThrow<string>('SECRET'),
       }),
     }),
-    CryptoModule,
     PrismaModule,
   ],
-  controllers: [UserController],
-  providers: [UserService],
+  controllers: [ProjectController],
+  providers: [ProjectService],
 })
-export class UserModule {}
+export class ProjectModule {}

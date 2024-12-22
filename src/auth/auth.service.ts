@@ -1,8 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { plainToInstance } from 'class-transformer';
-import { CryptoService } from '../common/crypto';
-import { PrismaService } from '../common/prisma';
+import { CryptoService } from 'src/common/crypto';
+import { PrismaService } from 'src/common/prisma';
 import { SignInByEmailAndPasswordDto, TokenDto } from './dto';
 
 @Injectable()
