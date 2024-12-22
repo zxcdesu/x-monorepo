@@ -1,5 +1,5 @@
 import { Body, Controller, Param, ParseIntPipe } from '@nestjs/common';
-import { ProjectId } from 'src/project';
+import { ProjectId } from 'src/auth';
 import { CreateRoleDto, RoleDto, UpdateRoleDto } from './dto';
 import { RoleService } from './role.service';
 

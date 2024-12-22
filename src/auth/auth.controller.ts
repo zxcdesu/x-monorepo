@@ -6,8 +6,8 @@ import {
   Post,
   SerializeOptions,
 } from '@nestjs/common';
-import { UserId } from 'src/user';
 import { AuthService } from './auth.service';
+import { UserId } from './decorators';
 import { SignInByEmailAndPasswordDto, SignInProjectDto, TokenDto } from './dto';
 
 @Controller({

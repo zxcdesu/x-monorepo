@@ -5,8 +5,7 @@ import {
   SerializeOptions,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from 'src/auth';
-import { ProjectId } from 'src/project';
+import { AuthGuard, ProjectId } from 'src/auth';
 import { CreateWalletDto, WalletDto } from './dto';
 import { WalletService } from './wallet.service';
 

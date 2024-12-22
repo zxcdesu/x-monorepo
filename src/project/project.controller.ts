@@ -10,8 +10,7 @@ import {
   SerializeOptions,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from 'src/auth';
-import { UserId } from 'src/user';
+import { AuthGuard, UserId } from 'src/auth';
 import { CreateProjectDto, ProjectDto, UpdateProjectDto } from './dto';
 import { ProjectService } from './project.service';
 

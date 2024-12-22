@@ -4,7 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { FastifyRequest } from 'fastify';
-import { ProjectDto } from '../dto';
+import { ProjectDto } from 'src/project';
 
 type Request = FastifyRequest & {
   user?: {

@@ -8,8 +8,7 @@ import {
   SerializeOptions,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from 'src/auth';
-import { UserId } from './decorators';
+import { AuthGuard, UserId } from 'src/auth';
 import { CreateUserDto, UpdateUserDto, UserDto } from './dto';
 import { UserService } from './user.service';
 
@@ -50,7 +49,7 @@ export class UserController {
   }
 
   @Delete('@me')
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @SerializeOptions({
     type: UserDto,
   })

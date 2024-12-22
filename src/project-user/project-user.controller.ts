@@ -1,6 +1,5 @@
 import { Controller, Get, SerializeOptions, UseGuards } from '@nestjs/common';
-import { AuthGuard } from 'src/auth';
-import { ProjectId } from 'src/project';
+import { AuthGuard, ProjectId } from 'src/auth';
 import { ProjectUserDto } from './dto';
 import { ProjectUserService } from './project-user.service';
 
