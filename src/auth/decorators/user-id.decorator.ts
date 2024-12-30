@@ -12,10 +12,11 @@ type Request = FastifyRequest & {
 
 export const UserId = createParamDecorator((_, ctx: ExecutionContext) => {
   const request = ctx.switchToHttp().getRequest<Request>();
+  const userId = request.user?.id;
 
-  if (request.user) {
-    return request.user.id;
+  if (!userId) {
+    throw new UnauthorizedException();
   }
 
-  throw new UnauthorizedException();
+  return userId;
 });

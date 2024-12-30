@@ -45,9 +45,35 @@ model Role {
 }
 
 model Wallet {
-  projectId      Int      @id
+  projectId      Int       @id
   project        Project?
   country        String
-  currency       String   @default("USD")
-  currentBalance Decimal  @default(0) @db.Decimal(15, 6)
+  currency       String    @default("USD")
+  currentBalance Decimal   @default(0) @db.Decimal(15, 6)
+  payments       Payment[]
+}
+
+enum PaymentProvider {
+  Yookassa
+}
+
+enum PaymentStatus {
+  Pending
+  Succeeded
+  Cancelled
+  Refunded
+}
+
+model Payment {
+  id           Int             @id @default(autoincrement())
+  projectId    Int
+  wallet       Wallet          @relation(fields: [projectId], references: [projectId])
+  externalId   String?
+  provider     PaymentProvider
+  status       PaymentStatus   @default(Pending)
+  amount       Decimal         @db.Decimal(15, 6)
+  incomeAmount Decimal?        @db.Decimal(15, 6)
+  expiresAt    DateTime?
+
+  @@unique([externalId, provider])
 }

@@ -5,6 +5,7 @@ import Joi from 'joi';
 import { AuthModule } from './auth';
 import { RateLimitModule } from './common/rate-limit';
 import { ReportModule } from './common/report';
+import { PaymentModule } from './payment/payment.module';
 import { ProjectModule } from './project';
 import { ProjectUserModule } from './project-user';
 import { RoleModule } from './role';
@@ -20,11 +21,15 @@ import { WalletModule } from './wallet';
         DATABASE_URL: Joi.string().uri().required(),
         PORT: Joi.number().port().default(3000),
         SECRET: Joi.string().required(),
+        YOOKASSA_SHOP_ID: Joi.string().required(),
+        YOOKASSA_TOKEN: Joi.string().required(),
+        YOOKASSA_RETURN_URL: Joi.string().uri().required(),
       }),
     }),
     AuthModule,
     RateLimitModule.forRoot({}),
     ReportModule.forRoot({}),
+    PaymentModule,
     ProjectModule,
     ProjectUserModule,
     RoleModule,
