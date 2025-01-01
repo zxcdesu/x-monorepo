@@ -3,8 +3,7 @@ import { plainToClass } from 'class-transformer';
 import { lastValueFrom, map } from 'rxjs';
 import { CreatePaymentDto, HandlePaymentDto, PaymentDto } from '../../dto';
 import { AbstractPaymentProvider } from '../abstract-payment.provider';
-import { YookassaWebhookDto } from './dto';
-import { YookassaPendingPayment } from './types';
+import { YookassaPendingPaymentDto, YookassaWebhookDto } from './dto';
 import { YookassaOptions } from './yookassa-options.interface';
 import {
   YOOKASSA_API_URL,
@@ -76,16 +75,16 @@ export class YookassaPaymentProvider extends AbstractPaymentProvider<
 
   private pendingPayment(
     payment: PaymentDto,
-    value: string,
+    amount: string,
     currency: string,
-  ): Promise<YookassaPendingPayment> {
+  ): Promise<YookassaPendingPaymentDto> {
     return lastValueFrom(
       this.httpService
-        .post<YookassaPendingPayment>(
+        .post<YookassaPendingPaymentDto>(
           YOOKASSA_API_URL.concat('/payments'),
           {
             amount: {
-              value,
+              value: amount,
               currency,
             },
             capture: true,
