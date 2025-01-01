@@ -1,9 +1,10 @@
-import { PaymentProvider, PaymentStatus } from '@prisma/client';
+import { PaymentStatus } from '@prisma/client';
 import { plainToClass } from 'class-transformer';
 import { lastValueFrom, map } from 'rxjs';
 import { CreatePaymentDto, HandlePaymentDto, PaymentDto } from '../../dto';
 import { AbstractPaymentProvider } from '../abstract-payment.provider';
-import { YookassaPendingPayment, YookassaWebhook } from './types';
+import { YookassaWebhookDto } from './dto';
+import { YookassaPendingPayment } from './types';
 import { YookassaOptions } from './yookassa-options.interface';
 import {
   YOOKASSA_API_URL,
@@ -12,7 +13,7 @@ import {
 
 export class YookassaPaymentProvider extends AbstractPaymentProvider<
   YookassaOptions,
-  YookassaWebhook
+  YookassaWebhookDto
 > {
   async create(
     data: CreatePaymentDto,
@@ -24,41 +25,42 @@ export class YookassaPaymentProvider extends AbstractPaymentProvider<
       },
     });
 
-    const response = await this.request(payment, data.amount, wallet.currency);
-    const createdAt = new Date(response.created_at);
+    const pendingPayment = await this.pendingPayment(
+      payment,
+      data.amount,
+      wallet.currency,
+    );
+    const createdAt = new Date(pendingPayment.created_at);
 
     return plainToClass(
       PaymentDto,
       Object.assign(
         await this.start(
           payment,
-          response.id,
+          pendingPayment.id,
           new Date(createdAt.getTime() + YOOKASSA_PAYMENT_EXPIRATION),
         ),
         {
           url: {
-            url: response.confirmation.confirmation_url,
+            url: pendingPayment.confirmation.confirmation_url,
           },
         },
       ),
     );
   }
 
-  async handle(data: HandlePaymentDto<YookassaWebhook>): Promise<void> {
+  async handle(data: HandlePaymentDto<YookassaWebhookDto>): Promise<void> {
     const { object } = data.value;
     const payment = await this.prismaService.payment.findUnique({
       where: {
         externalId_provider: {
           externalId: object.id,
-          provider: PaymentProvider.Yookassa,
+          provider: data.provider,
         },
       },
     });
 
     if (payment) {
-      const amount =
-        object.income_amount ?? object.refunded_amount ?? object.amount;
-
       await this.success(
         payment,
         {
@@ -67,12 +69,12 @@ export class YookassaPaymentProvider extends AbstractPaymentProvider<
           'payment.canceled': PaymentStatus.Cancelled,
           'refund.succeeded': PaymentStatus.Refunded,
         }[data.value.event],
-        amount.value,
+        (object.income_amount ?? object.refunded_amount ?? object.amount).value,
       );
     }
   }
 
-  private request(
+  private pendingPayment(
     payment: PaymentDto,
     value: string,
     currency: string,

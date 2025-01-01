@@ -1,7 +1,7 @@
-import { YookassaPaymentObject } from './yookassa-payment-object.type';
-import { YookassaPendingPaymentConfirmation } from './yookassa-pending-payment-confirmation.type';
+import { YookassaPaymentObjectDto } from '../dto/yookassa-payment-object.dto';
+import { YookassaPendingPaymentConfirmationDto } from '../dto/yookassa-pending-payment-confirmation.dto';
 
 export interface YookassaPendingPayment
-  extends Omit<YookassaPaymentObject, 'income_amount' | 'refunded_amount'> {
-  confirmation: YookassaPendingPaymentConfirmation;
+  extends Omit<YookassaPaymentObjectDto, 'income_amount' | 'refunded_amount'> {
+  confirmation: YookassaPendingPaymentConfirmationDto;
 }

@@ -1,4 +1,5 @@
 import {
+  All,
   Body,
   Controller,
   HttpCode,
@@ -9,8 +10,9 @@ import {
 } from '@nestjs/common';
 import { PaymentProvider } from '@prisma/client';
 import { AuthGuard, ProjectId } from 'src/auth';
-import { CreatePaymentDto, HandlePaymentDto, PaymentDto } from './dto';
-import { YookassaGuard } from './payment-provider';
+import { CreatePaymentDto, PaymentDto } from './dto';
+import { YookassaGuard, YookassaWebhookDto } from './payment-provider';
+import { PaymentGuard } from './payment.guard';
 import { PaymentService } from './payment.service';
 
 @Controller({
@@ -32,10 +34,13 @@ export class PaymentController {
     return this.paymentService.create(projectId, data);
   }
 
-  @Post('webhook')
+  @All('webhook/:secret/yookassa')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(YookassaGuard)
-  yookassaWebhook(@Body() data: HandlePaymentDto<unknown>): Promise<void> {
-    return this.paymentService.handleWebhook(PaymentProvider.Yookassa, data);
+  @UseGuards(PaymentGuard, YookassaGuard)
+  yookassaWebhook(@Body() data: YookassaWebhookDto): Promise<void> {
+    return this.paymentService.handleWebhook(PaymentProvider.Yookassa, {
+      provider: PaymentProvider.Yookassa,
+      value: data,
+    });
   }
 }

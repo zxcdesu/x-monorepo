@@ -17,7 +17,11 @@ export abstract class AbstractPaymentProvider<O = unknown, T = unknown> {
 
   abstract handle(data: HandlePaymentDto<T>): Promise<void>;
 
-  protected start(payment: PaymentDto, externalId?: string, expiresAt?: Date) {
+  protected start(
+    payment: PaymentDto,
+    externalId?: string,
+    expiresAt?: Date,
+  ): Promise<PaymentDto> {
     return this.prismaService.payment.update({
       where: {
         id: payment.id,
