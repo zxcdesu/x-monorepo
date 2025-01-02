@@ -1,6 +1,6 @@
 import { Payment, PaymentProvider, PaymentStatus } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
-import { Exclude, Expose, Transform } from 'class-transformer';
+import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { PaymentUrlDto } from './payment-url.dto';
 
 @Exclude()
@@ -32,5 +32,6 @@ export class PaymentDto implements Payment {
   expiresAt: Date;
 
   @Expose()
+  @Type(() => PaymentUrlDto)
   url?: PaymentUrlDto;
 }

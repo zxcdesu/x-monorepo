@@ -1,6 +1,7 @@
-import { IsUrl } from 'class-validator';
+import { Exclude, Expose } from 'class-transformer';
 
+@Exclude()
 export class YookassaPendingPaymentConfirmationDto {
-  @IsUrl()
-  confirmation_url: string;
+  @Expose({ name: 'confirmation_url' })
+  confirmationUrl: string;
 }

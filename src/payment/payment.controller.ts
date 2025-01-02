@@ -1,5 +1,4 @@
 import {
-  All,
   Body,
   Controller,
   HttpCode,
@@ -34,7 +33,7 @@ export class PaymentController {
     return this.paymentService.create(projectId, data);
   }
 
-  @All('webhook/:secret/yookassa')
+  @Post('webhook/:secret/yookassa')
   @HttpCode(HttpStatus.OK)
   @UseGuards(PaymentGuard, YookassaGuard)
   yookassaWebhook(@Body() data: YookassaWebhookDto): Promise<void> {

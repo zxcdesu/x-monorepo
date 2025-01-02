@@ -36,7 +36,7 @@ export abstract class AbstractPaymentProvider<O = unknown, T = unknown> {
   protected success(
     payment: PaymentDto,
     status: PaymentStatus,
-    incomeAmount?: string,
+    amount?: string,
   ): Promise<PaymentDto> {
     return this.prismaService.$transaction(async (transaction) => {
       payment = await transaction.payment.update({
@@ -45,21 +45,36 @@ export abstract class AbstractPaymentProvider<O = unknown, T = unknown> {
         },
         data: {
           status,
-          incomeAmount,
+          incomeAmount: amount,
         },
       });
 
-      if (status === PaymentStatus.Succeeded) {
-        await transaction.wallet.update({
-          where: {
-            projectId: payment.projectId,
-          },
-          data: {
-            currentBalance: {
-              increment: incomeAmount,
+      switch (status) {
+        case PaymentStatus.Succeeded:
+          await transaction.wallet.update({
+            where: {
+              projectId: payment.projectId,
             },
-          },
-        });
+            data: {
+              currentBalance: {
+                increment: amount,
+              },
+            },
+          });
+          break;
+
+        case PaymentStatus.Refunded:
+          await transaction.wallet.update({
+            where: {
+              projectId: payment.projectId,
+            },
+            data: {
+              currentBalance: {
+                decrement: amount,
+              },
+            },
+          });
+          break;
       }
 
       return payment;

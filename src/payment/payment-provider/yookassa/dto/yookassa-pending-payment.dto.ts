@@ -1,14 +1,14 @@
 import { OmitType } from '@nestjs/mapped-types';
-import { Type } from 'class-transformer';
-import { ValidateNested } from 'class-validator';
+import { Exclude, Expose, Type } from 'class-transformer';
 import { YookassaPaymentObjectDto } from './yookassa-payment-object.dto';
 import { YookassaPendingPaymentConfirmationDto } from './yookassa-pending-payment-confirmation.dto';
 
+@Exclude()
 export class YookassaPendingPaymentDto extends OmitType(
   YookassaPaymentObjectDto,
-  ['income_amount', 'refunded_amount'] as const,
+  ['incomeAmount', 'refundedAmount'] as const,
 ) {
+  @Expose()
   @Type(() => YookassaPendingPaymentConfirmationDto)
-  @ValidateNested()
   confirmation: YookassaPendingPaymentConfirmationDto;
 }

@@ -1,10 +1,4 @@
-import { Type } from 'class-transformer';
-import {
-  IsDateString,
-  IsOptional,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
+import { Exclude, Expose, Type } from 'class-transformer';
 import { YookassaPaymentAmountDto } from './yookassa-payment-amount.dto';
 
 /**
@@ -12,24 +6,23 @@ import { YookassaPaymentAmountDto } from './yookassa-payment-amount.dto';
  *
  * @see https://yookassa.ru/developers/api#payment_object
  */
+@Exclude()
 export class YookassaPaymentObjectDto {
-  @IsString()
+  @Expose()
   id: string;
 
+  @Expose()
   @Type(() => YookassaPaymentAmountDto)
-  @ValidateNested()
   amount: YookassaPaymentAmountDto;
 
+  @Expose({ name: 'income_amount' })
   @Type(() => YookassaPaymentAmountDto)
-  @IsOptional()
-  @ValidateNested()
-  income_amount?: YookassaPaymentAmountDto;
+  incomeAmount?: YookassaPaymentAmountDto;
 
+  @Expose({ name: 'refunded_amount' })
   @Type(() => YookassaPaymentAmountDto)
-  @IsOptional()
-  @ValidateNested()
-  refunded_amount?: YookassaPaymentAmountDto;
+  refundedAmount?: YookassaPaymentAmountDto;
 
-  @IsDateString()
-  created_at: string;
+  @Expose({ name: 'created_at' })
+  createdAt: string;
 }

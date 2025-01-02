@@ -4,6 +4,7 @@ import { lastValueFrom, map } from 'rxjs';
 import { CreatePaymentDto, HandlePaymentDto, PaymentDto } from '../../dto';
 import { AbstractPaymentProvider } from '../abstract-payment.provider';
 import { YookassaPendingPaymentDto, YookassaWebhookDto } from './dto';
+import { YookassaWebhookEvent } from './enums';
 import { YookassaOptions } from './yookassa-options.interface';
 import {
   YOOKASSA_API_URL,
@@ -14,6 +15,16 @@ export class YookassaPaymentProvider extends AbstractPaymentProvider<
   YookassaOptions,
   YookassaWebhookDto
 > {
+  private static readonly eventToStatus: Record<
+    YookassaWebhookEvent,
+    PaymentStatus
+  > = {
+    [YookassaWebhookEvent.PaymentSucceeded]: PaymentStatus.Succeeded,
+    [YookassaWebhookEvent.PaymentWaitingForCapture]: PaymentStatus.Pending,
+    [YookassaWebhookEvent.PaymentCanceled]: PaymentStatus.Cancelled,
+    [YookassaWebhookEvent.RefundSucceeded]: PaymentStatus.Refunded,
+  };
+
   async create(
     data: CreatePaymentDto,
     payment: PaymentDto,
@@ -29,7 +40,8 @@ export class YookassaPaymentProvider extends AbstractPaymentProvider<
       data.amount,
       wallet.currency,
     );
-    const createdAt = new Date(pendingPayment.created_at);
+
+    const createdAt = new Date(pendingPayment.createdAt);
 
     return plainToClass(
       PaymentDto,
@@ -41,7 +53,7 @@ export class YookassaPaymentProvider extends AbstractPaymentProvider<
         ),
         {
           url: {
-            url: pendingPayment.confirmation.confirmation_url,
+            url: pendingPayment.confirmation.confirmationUrl,
           },
         },
       ),
@@ -60,51 +72,52 @@ export class YookassaPaymentProvider extends AbstractPaymentProvider<
     });
 
     if (payment) {
+      const amount =
+        object.incomeAmount ?? object.refundedAmount ?? object.amount;
+
       await this.success(
         payment,
-        {
-          'payment.succeeded': PaymentStatus.Succeeded,
-          'payment.waiting_for_capture': PaymentStatus.Pending,
-          'payment.canceled': PaymentStatus.Cancelled,
-          'refund.succeeded': PaymentStatus.Refunded,
-        }[data.value.event],
-        (object.income_amount ?? object.refunded_amount ?? object.amount).value,
+        YookassaPaymentProvider.eventToStatus[data.value.event],
+        amount.value,
       );
     }
   }
 
-  private pendingPayment(
+  private async pendingPayment(
     payment: PaymentDto,
     amount: string,
     currency: string,
   ): Promise<YookassaPendingPaymentDto> {
-    return lastValueFrom(
-      this.httpService
-        .post<YookassaPendingPaymentDto>(
-          YOOKASSA_API_URL.concat('/payments'),
-          {
-            amount: {
-              value: amount,
-              currency,
+    return plainToClass(
+      YookassaPendingPaymentDto,
+      await lastValueFrom(
+        this.httpService
+          .post<YookassaPendingPaymentDto>(
+            YOOKASSA_API_URL.concat('/payments'),
+            {
+              amount: {
+                value: amount,
+                currency,
+              },
+              capture: true,
+              confirmation: {
+                type: 'redirect',
+                return_url: this.options.returnUrl,
+              },
+              description: null,
             },
-            capture: true,
-            confirmation: {
-              type: 'redirect',
-              return_url: this.options.returnUrl,
+            {
+              auth: {
+                username: this.options.shopId,
+                password: this.options.token,
+              },
+              headers: {
+                'Idempotence-Key': payment.id,
+              },
             },
-            description: null,
-          },
-          {
-            auth: {
-              username: this.options.shopId,
-              password: this.options.token,
-            },
-            headers: {
-              'Idempotence-Key': payment.id,
-            },
-          },
-        )
-        .pipe(map(({ data }) => data)),
+          )
+          .pipe(map(({ data }) => data)),
+      ),
     );
   }
 }
