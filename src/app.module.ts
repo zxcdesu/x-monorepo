@@ -9,6 +9,8 @@ import { PaymentModule } from './payment/payment.module';
 import { ProjectModule } from './project';
 import { ProjectUserModule } from './project-user';
 import { RoleModule } from './role';
+import { SubscriptionModule } from './subscription';
+import { SubscriptionPlanModule } from './subscription-plan';
 import { UserModule } from './user';
 import { WalletModule } from './wallet';
 
@@ -33,6 +35,8 @@ import { WalletModule } from './wallet';
     ProjectModule,
     ProjectUserModule,
     RoleModule,
+    SubscriptionModule,
+    SubscriptionPlanModule,
     UserModule,
     WalletModule,
   ],

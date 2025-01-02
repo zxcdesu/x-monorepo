@@ -45,12 +45,13 @@ model Role {
 }
 
 model Wallet {
-  projectId      Int       @id
+  projectId      Int           @id
   project        Project?
   country        String
-  currency       String    @default("USD")
-  currentBalance Decimal   @default(0) @db.Decimal(15, 6)
+  currency       String        @default("USD")
+  currentBalance Decimal       @default(0) @db.Decimal(15, 6)
   payments       Payment[]
+  subscription   Subscription?
 }
 
 enum PaymentProvider {
@@ -76,4 +77,21 @@ model Payment {
   expiresAt    DateTime?
 
   @@unique([externalId, provider])
+}
+
+model Subscription {
+  projectId Int              @id
+  wallet    Wallet           @relation(fields: [projectId], references: [projectId])
+  planId    Int
+  plan      SubscriptionPlan @relation(fields: [planId], references: [id])
+  expiresAt DateTime
+}
+
+model SubscriptionPlan {
+  id            Int            @id
+  name          String
+  price         Decimal        @db.Decimal(15, 6)
+  currency      String         @default("USD")
+  duration      Int
+  subscriptions Subscription[]
 }
