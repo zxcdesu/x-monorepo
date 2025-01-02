@@ -6,12 +6,12 @@ import {
 import { FastifyRequest } from 'fastify';
 import { UserDto } from 'src/user';
 
-type Request = FastifyRequest & {
+export type UserId = FastifyRequest & {
   user?: Pick<UserDto, 'id'>;
 };
 
 export const UserId = createParamDecorator((_, ctx: ExecutionContext) => {
-  const request = ctx.switchToHttp().getRequest<Request>();
+  const request = ctx.switchToHttp().getRequest<UserId>();
   const userId = request.user?.id;
 
   if (!userId) {
