@@ -14,7 +14,7 @@ export const UserId = createParamDecorator((_, ctx: ExecutionContext) => {
   const request = ctx.switchToHttp().getRequest<UserId>();
   const userId = request.user?.id;
 
-  if (!userId) {
+  if (Number.isNaN(userId)) {
     throw new UnauthorizedException();
   }
 

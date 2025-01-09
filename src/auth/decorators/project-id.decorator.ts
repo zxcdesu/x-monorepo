@@ -16,7 +16,7 @@ export const ProjectId = createParamDecorator((_, ctx: ExecutionContext) => {
   const request = ctx.switchToHttp().getRequest<ProjectId>();
   const projectId = request.user?.project?.id;
 
-  if (!projectId) {
+  if (Number.isNaN(projectId)) {
     throw new UnauthorizedException();
   }
 
