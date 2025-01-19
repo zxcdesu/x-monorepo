@@ -17,7 +17,7 @@ export class WalletController {
   constructor(private readonly walletService: WalletService) {}
 
   create(
-    @ProjectId() projectId: number,
+    @ProjectId() projectId: string,
     @Body() data: CreateWalletDto,
   ): Promise<WalletDto> {
     return this.walletService.create(projectId, data);
@@ -28,7 +28,7 @@ export class WalletController {
   @SerializeOptions({
     type: WalletDto,
   })
-  findMe(@ProjectId() projectId: number): Promise<WalletDto> {
+  findMe(@ProjectId() projectId: string): Promise<WalletDto> {
     return this.walletService.findOne(projectId);
   }
 }

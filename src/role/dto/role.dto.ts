@@ -1,23 +1,28 @@
-import { Role } from '@prisma/client';
-import { Exclude, Expose } from 'class-transformer';
+import { Permission, Role } from '@prisma/client';
+import { Exclude, Expose, Transform } from 'class-transformer';
 
 @Exclude()
 export class RoleDto implements Role {
   @Expose()
-  id: number;
+  id: string;
+
+  @Exclude()
+  projectId: string;
 
   @Expose()
   name: string;
 
   @Exclude()
-  projectId: number;
-
-  @Exclude()
-  userId: number;
-
-  @Exclude()
   default: boolean;
 
   @Expose()
-  permissions: string[];
+  permissions: Permission[];
+
+  @Expose()
+  @Transform(({ value }) => String(value), { toPlainOnly: true })
+  createdAt: Date;
+
+  @Expose()
+  @Transform(({ value }) => String(value), { toPlainOnly: true })
+  updatedAt: Date;
 }

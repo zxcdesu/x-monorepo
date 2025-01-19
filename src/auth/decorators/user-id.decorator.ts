@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   UnauthorizedException,
 } from '@nestjs/common';
+import { isUUID } from 'class-validator';
 import { FastifyRequest } from 'fastify';
 import { UserDto } from 'src/user';
 
@@ -14,9 +15,9 @@ export const UserId = createParamDecorator((_, ctx: ExecutionContext) => {
   const request = ctx.switchToHttp().getRequest<UserId>();
   const userId = request.user?.id;
 
-  if (Number.isNaN(userId)) {
-    throw new UnauthorizedException();
+  if (isUUID(userId)) {
+    return userId;
   }
 
-  return userId;
+  throw new UnauthorizedException();
 });

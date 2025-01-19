@@ -6,7 +6,7 @@ import {
 } from 'class-validator';
 
 export class CreateWalletDto
-  implements Omit<Prisma.WalletCreateInput, 'projectId'>
+  implements Omit<Prisma.WalletUncheckedCreateInput, 'projectId'>
 {
   @IsISO31661Alpha2()
   country: string;

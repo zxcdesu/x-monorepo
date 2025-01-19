@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CryptoService } from 'src/common/crypto';
 import { PrismaService } from 'src/common/prisma';
+import { v7 } from 'uuid';
 import { CreateUserDto, UpdateUserDto, UserDto } from './dto';
 
 @Injectable()
@@ -13,13 +14,14 @@ export class UserService {
   async create(data: CreateUserDto): Promise<UserDto> {
     return this.prismaService.user.create({
       data: {
+        id: v7(),
         ...data,
         password: await this.cryptoService.hash(data.password),
       },
     });
   }
 
-  findOne(id: number): Promise<UserDto> {
+  findOne(id: string): Promise<UserDto> {
     return this.prismaService.user.findUniqueOrThrow({
       where: {
         id,
@@ -27,7 +29,7 @@ export class UserService {
     });
   }
 
-  update(id: number, data: UpdateUserDto): Promise<UserDto> {
+  update(id: string, data: UpdateUserDto): Promise<UserDto> {
     return this.prismaService.user.update({
       where: {
         id,
@@ -36,7 +38,7 @@ export class UserService {
     });
   }
 
-  remove(id: number): Promise<UserDto> {
+  remove(id: string): Promise<UserDto> {
     return this.prismaService.user.delete({
       where: {
         id,

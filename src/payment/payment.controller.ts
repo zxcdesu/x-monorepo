@@ -7,7 +7,7 @@ import {
   SerializeOptions,
   UseGuards,
 } from '@nestjs/common';
-import { PaymentProvider } from '@prisma/client';
+import { PaymentAdapter } from '@prisma/client';
 import { AuthGuard, ProjectId } from 'src/auth';
 import { CreatePaymentDto, PaymentDto } from './dto';
 import { YookassaGuard, YookassaWebhookDto } from './payment-provider';
@@ -27,7 +27,7 @@ export class PaymentController {
     type: PaymentDto,
   })
   create(
-    @ProjectId() projectId: number,
+    @ProjectId() projectId: string,
     data: CreatePaymentDto,
   ): Promise<PaymentDto> {
     return this.paymentService.create(projectId, data);
@@ -36,10 +36,10 @@ export class PaymentController {
   @Post('webhook/:secret/yookassa')
   @HttpCode(HttpStatus.OK)
   @UseGuards(PaymentGuard, YookassaGuard)
-  yookassaWebhook(@Body() data: YookassaWebhookDto): Promise<void> {
-    return this.paymentService.handleWebhook(PaymentProvider.Yookassa, {
-      provider: PaymentProvider.Yookassa,
-      value: data,
+  handleYookassaWebhook(@Body() data: YookassaWebhookDto): Promise<void> {
+    return this.paymentService.handleWebhook({
+      adapter: PaymentAdapter.Yookassa,
+      data,
     });
   }
 }

@@ -15,14 +15,20 @@ export class YookassaPaymentObjectDto {
   @Type(() => YookassaPaymentAmountDto)
   amount: YookassaPaymentAmountDto;
 
-  @Expose({ name: 'income_amount' })
+  @Expose({
+    name: 'income_amount',
+  })
   @Type(() => YookassaPaymentAmountDto)
   incomeAmount?: YookassaPaymentAmountDto;
 
-  @Expose({ name: 'refunded_amount' })
+  @Expose({
+    name: 'refunded_amount',
+  })
   @Type(() => YookassaPaymentAmountDto)
   refundedAmount?: YookassaPaymentAmountDto;
 
-  @Expose({ name: 'created_at' })
+  @Expose({
+    name: 'created_at',
+  })
   createdAt: string;
 }

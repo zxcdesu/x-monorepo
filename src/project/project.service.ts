@@ -1,23 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma';
+import { v7 } from 'uuid';
 import { CreateProjectDto, ProjectDto, UpdateProjectDto } from './dto';
 
 @Injectable()
 export class ProjectService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  create(userId: number, data: CreateProjectDto): Promise<ProjectDto> {
+  create(userId: string, data: CreateProjectDto): Promise<ProjectDto> {
     return this.prismaService.project.create({
       data: {
+        id: v7(),
         users: {
           create: {
             userId,
-            roles: {
-              create: {
-                name: data.name,
-                default: true,
-              },
-            },
+            // TODO: add default role
           },
         },
         ...data,
@@ -25,7 +22,7 @@ export class ProjectService {
     });
   }
 
-  findOne(userId: number, id: number): Promise<ProjectDto> {
+  findOne(userId: string, id: string): Promise<ProjectDto> {
     return this.prismaService.project.findUniqueOrThrow({
       where: {
         id,
@@ -38,7 +35,7 @@ export class ProjectService {
     });
   }
 
-  findAll(userId: number): Promise<ProjectDto[]> {
+  findAll(userId: string): Promise<ProjectDto[]> {
     return this.prismaService.project.findMany({
       where: {
         users: {
@@ -51,8 +48,8 @@ export class ProjectService {
   }
 
   update(
-    userId: number,
-    id: number,
+    userId: string,
+    id: string,
     data: UpdateProjectDto,
   ): Promise<ProjectDto> {
     return this.prismaService.project.update({
@@ -68,7 +65,7 @@ export class ProjectService {
     });
   }
 
-  remove(userId: number, id: number): Promise<ProjectDto> {
+  remove(userId: string, id: string): Promise<ProjectDto> {
     return this.prismaService.project.delete({
       where: {
         id,

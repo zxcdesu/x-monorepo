@@ -1,21 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { PaymentProvider } from '@prisma/client';
 import { PrismaService } from 'src/common/prisma';
+import { v7 } from 'uuid';
 import { CreatePaymentDto, HandlePaymentDto, PaymentDto } from './dto';
-import { PaymentProviderRepository } from './payment-provider';
+import { PaymentAdapterRepository } from './payment-provider';
 
 @Injectable()
 export class PaymentService {
   constructor(
-    private readonly paymentProviderRepository: PaymentProviderRepository,
+    private readonly paymentProviderRepository: PaymentAdapterRepository,
     private readonly prismaService: PrismaService,
   ) {}
 
-  async create(projectId: number, data: CreatePaymentDto): Promise<PaymentDto> {
-    return this.paymentProviderRepository.get(data.provider).create(
+  async create(projectId: string, data: CreatePaymentDto): Promise<PaymentDto> {
+    return this.paymentProviderRepository.get(data.adapter).create(
       data,
       await this.prismaService.payment.create({
         data: {
+          id: v7(),
           projectId,
           ...data,
         },
@@ -23,10 +24,7 @@ export class PaymentService {
     );
   }
 
-  handleWebhook(
-    provider: PaymentProvider,
-    data: HandlePaymentDto<unknown>,
-  ): Promise<void> {
-    return this.paymentProviderRepository.get(provider).handle(data);
+  handleWebhook(data: HandlePaymentDto<unknown>): Promise<void> {
+    return this.paymentProviderRepository.get(data.adapter).handle(data);
   }
 }

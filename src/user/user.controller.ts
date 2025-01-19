@@ -32,7 +32,7 @@ export class UserController {
   @SerializeOptions({
     type: UserDto,
   })
-  findOne(@UserId() userId: number): Promise<UserDto> {
+  findOne(@UserId() userId: string): Promise<UserDto> {
     return this.userService.findOne(userId);
   }
 
@@ -42,18 +42,18 @@ export class UserController {
     type: UserDto,
   })
   update(
-    @UserId() userId: number,
+    @UserId() userId: string,
     @Body() data: UpdateUserDto,
   ): Promise<UserDto> {
     return this.userService.update(userId, data);
   }
 
   @Delete('@me')
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @SerializeOptions({
     type: UserDto,
   })
-  remove(@UserId() userId: number): Promise<UserDto> {
+  remove(@UserId() userId: string): Promise<UserDto> {
     return this.userService.remove(userId);
   }
 }

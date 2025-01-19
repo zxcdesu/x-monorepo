@@ -1,4 +1,4 @@
-export * from './payment-provider-options.interface';
-export * from './payment-provider.module';
-export * from './payment-provider.repository';
+export * from './payment-adapter-options.interface';
+export * from './payment-adapter.module';
+export * from './payment-adapter.repository';
 export * from './yookassa';

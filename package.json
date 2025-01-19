@@ -2,7 +2,11 @@
   "name": "x-monorepo",
   "version": "0.0.1",
   "description": "",
-  "author": "",
+  "author": "zxcdesu",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zxcdesu/x-monorepo.git"
+  },
   "private": true,
   "prisma": {
     "schema": "./src/common/prisma/schema.prisma"
@@ -44,7 +48,8 @@
     "openai": "^4.77.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "xlsx": "^0.18.5"
+    "uuid": "^11.0.5",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.4.9",

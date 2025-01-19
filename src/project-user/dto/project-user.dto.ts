@@ -1,14 +1,21 @@
+import { ProjectUser } from '@prisma/client';
 import { Exclude, Expose, Type } from 'class-transformer';
-import { RoleDto } from 'src/role';
 import { UserDto } from 'src/user';
+import { ProjectUserRoleDto } from './project-user-role.dto';
 
 @Exclude()
-export class ProjectUserDto {
+export class ProjectUserDto implements ProjectUser {
+  @Exclude()
+  projectId: string;
+
+  @Exclude()
+  userId: string;
+
   @Expose()
   @Type(() => UserDto)
   user: UserDto;
 
   @Expose()
-  @Type(() => RoleDto)
-  roles: RoleDto[];
+  @Type(() => ProjectUserRoleDto)
+  roles: ProjectUserRoleDto[];
 }

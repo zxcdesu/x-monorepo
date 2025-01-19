@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { PaymentProvider } from '@prisma/client';
+import { PaymentAdapter } from '@prisma/client';
 import { JwtOptionsFactoryService } from 'src/common/jwt';
 import { PrismaModule } from 'src/common/prisma';
-import { PaymentProviderModule } from './payment-provider';
+import { PaymentAdapterModule } from './payment-provider';
 import { PaymentController } from './payment.controller';
 import { PaymentService } from './payment.service';
 
@@ -14,10 +14,10 @@ import { PaymentService } from './payment.service';
       useClass: JwtOptionsFactoryService,
     }),
     PrismaModule,
-    PaymentProviderModule.forRootAsync({
+    PaymentAdapterModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        [PaymentProvider.Yookassa]: {
+        [PaymentAdapter.Yookassa]: {
           shopId: configService.getOrThrow<string>('YOOKASSA_SHOP_ID'),
           token: configService.getOrThrow<string>('YOOKASSA_TOKEN'),
           returnUrl: configService.getOrThrow<string>('YOOKASSA_RETURN_URL'),

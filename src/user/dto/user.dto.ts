@@ -4,7 +4,7 @@ import { Exclude, Expose } from 'class-transformer';
 @Exclude()
 export class UserDto implements User {
   @Expose()
-  id: number;
+  id: string;
 
   @Expose()
   email: string;
@@ -14,4 +14,13 @@ export class UserDto implements User {
 
   @Exclude()
   password: string;
+
+  @Exclude()
+  blocked: boolean;
+
+  @Expose()
+  createdAt: Date;
+
+  @Expose()
+  updatedAt: Date;
 }

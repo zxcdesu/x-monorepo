@@ -5,7 +5,7 @@ import { Exclude, Expose, Transform } from 'class-transformer';
 @Exclude()
 export class WalletDto implements Wallet {
   @Expose()
-  projectId: number;
+  projectId: string;
 
   @Expose()
   country: string;
@@ -14,6 +14,14 @@ export class WalletDto implements Wallet {
   currency: string;
 
   @Expose()
-  @Transform(({ value }) => String(value), { toPlainOnly: true })
+  @Transform(({ value }) => String(value), {
+    toPlainOnly: true,
+  })
   currentBalance: Decimal;
+
+  @Expose()
+  createdAt: Date;
+
+  @Expose()
+  updatedAt: Date;
 }

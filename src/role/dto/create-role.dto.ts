@@ -1,8 +1,14 @@
-import { Prisma } from '@prisma/client';
-import { ArrayMinSize, IsArray, IsNotEmpty, IsString } from 'class-validator';
+import { Permission, Prisma } from '@prisma/client';
+import {
+  ArrayMinSize,
+  IsArray,
+  IsEnum,
+  IsNotEmpty,
+  IsString,
+} from 'class-validator';
 
 export class CreateRoleDto
-  implements Omit<Prisma.RoleUncheckedCreateInput, 'projectId'>
+  implements Omit<Prisma.RoleUncheckedCreateInput, 'id' | 'projectId'>
 {
   @IsString()
   @IsNotEmpty()
@@ -10,6 +16,8 @@ export class CreateRoleDto
 
   @IsArray()
   @ArrayMinSize(1)
-  @IsString({ each: true })
-  permissions: string[];
+  @IsEnum(Permission, {
+    each: true,
+  })
+  permissions: Permission[];
 }

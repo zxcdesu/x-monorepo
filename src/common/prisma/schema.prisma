@@ -8,53 +8,85 @@ datasource db {
 }
 
 model User {
-  id       Int           @id @default(autoincrement())
-  email    String        @unique
-  name     String
-  password String
-  projects ProjectUser[]
+  id            String         @id @db.Uuid
+  email         String         @unique
+  name          String
+  blocked       Boolean        @default(false)
+  password      String
+  projects      ProjectUser[]
+  notifications Notification[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 }
 
 model Project {
-  id     Int           @id @default(autoincrement())
-  name   String
-  users  ProjectUser[]
-  roles  Role[]
-  wallet Wallet?       @relation(fields: [id], references: [projectId])
+  id           String        @id @db.Uuid
+  name         String
+  blocked      Boolean       @default(false)
+  users        ProjectUser[]
+  roles        Role[]
+  wallet       Wallet?
+  channels     Channel[]
+  contacts     Contact[]
+  hsm          Hsm[]
+  tags         Tag[]
+  fields       Field[]
+  webhooks     Webhook[]
+  integrations Integration[]
+  mailings     Mailing[]
+  bots         Bot[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }
 
 model ProjectUser {
-  projectId Int
-  project   Project @relation(fields: [projectId], references: [id])
-  userId    Int
-  user      User    @relation(fields: [userId], references: [id])
-  roles     Role[]
+  projectId String            @db.Uuid
+  project   Project           @relation(fields: [projectId], references: [id])
+  userId    String            @db.Uuid
+  user      User              @relation(fields: [userId], references: [id])
+  roles     ProjectUserRole[]
 
-  @@unique([projectId, userId])
+  @@id([projectId, userId])
+}
+
+model ProjectUserRole {
+  projectId String      @db.Uuid
+  userId    String      @db.Uuid
+  user      ProjectUser @relation(fields: [projectId, userId], references: [projectId, userId])
+  roleId    String      @db.Uuid
+  role      Role        @relation(fields: [roleId], references: [id])
+
+  @@id([projectId, userId, roleId])
+}
+
+enum Permission {
+  Root
 }
 
 model Role {
-  id          Int          @id @default(autoincrement())
+  id          String            @id @db.Uuid
+  projectId   String            @db.Uuid
+  project     Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
   name        String
-  projectId   Int
-  project     Project      @relation(fields: [projectId], references: [id])
-  userId      Int?
-  users       ProjectUser? @relation(fields: [projectId, userId], references: [projectId, userId])
-  default     Boolean      @default(false)
-  permissions String[]     @default([])
+  default     Boolean           @default(false)
+  permissions Permission[]      @default([])
+  users       ProjectUserRole[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
 }
 
 model Wallet {
-  projectId      Int           @id
-  project        Project?
+  projectId      String    @id @db.Uuid
+  project        Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
   country        String
-  currency       String        @default("USD")
-  currentBalance Decimal       @default(0) @db.Decimal(15, 6)
+  currency       String    @default("USD")
+  currentBalance Decimal   @default(0) @db.Decimal(15, 6)
   payments       Payment[]
-  subscription   Subscription?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }
 
-enum PaymentProvider {
+enum PaymentAdapter {
   Yookassa
 }
 
@@ -66,32 +98,282 @@ enum PaymentStatus {
 }
 
 model Payment {
-  id           Int             @id @default(autoincrement())
-  projectId    Int
-  wallet       Wallet          @relation(fields: [projectId], references: [projectId])
+  id           String         @id @db.Uuid
+  projectId    String         @db.Uuid
+  wallet       Wallet         @relation(fields: [projectId], references: [projectId], onDelete: Cascade)
+  adapter      PaymentAdapter
   externalId   String?
-  provider     PaymentProvider
-  status       PaymentStatus   @default(Pending)
-  amount       Decimal         @db.Decimal(15, 6)
-  incomeAmount Decimal?        @db.Decimal(15, 6)
+  status       PaymentStatus  @default(Pending)
+  amount       Decimal        @db.Decimal(15, 6)
+  incomeAmount Decimal?       @db.Decimal(15, 6)
   expiresAt    DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
 
-  @@unique([externalId, provider])
+  @@unique([externalId, adapter])
+}
+
+model Notification {
+  id        String   @id @db.Uuid
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  header    String
+  text      String
+  url       String?
+  viewed    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ChannelAdapter {
+  Gupshup
+  Instagram
+  Telegram
+  Viber
+  Vkontakte
+  Webapp
+}
+
+enum ChannelStatus {
+  Connected
+  Failed
+}
+
+model Channel {
+  id           String         @id @db.Uuid
+  projectId    String
+  project      Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name         String
+  adapter      ChannelAdapter
+  externalId   String
+  token        Json
+  status       ChannelStatus
+  failedReason String?
+  chats        Chat[]
+  mailings     Mailing[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@unique([externalId, adapter])
+}
+
+model Contact {
+  id          String          @id @db.Uuid
+  projectId   String
+  project     Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name        String
+  description String          @default("")
+  imageUrl    String?
+  chats       Chat[]
+  tags        ContactTag[]
+  fields      ContactField[]
+  mailings    MailingWorker[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model Chat {
+  id         String    @id @db.Uuid
+  contactId  String    @db.Uuid
+  contact    Contact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  channelId  String?   @db.Uuid
+  channel    Channel?  @relation(fields: [channelId], references: [id], onDelete: SetNull)
+  externalId String
+  messages   Message[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+enum MessageStatus {
+  Submitted
+  Delivered
+  Read
+  Failed
+}
+
+model Message {
+  id           String         @id @db.Uuid
+  chatId       String         @db.Uuid
+  chat         Chat           @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  externalId   String
+  status       MessageStatus
+  failedReason String?
+  text         String?
+  attachments  Json[]         @default([])
+  buttons      Json[]         @default([])
+  mailing      MailingWorker?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model Hsm {
+  id          String    @id @db.Uuid
+  projectId   String    @db.Uuid
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name        String
+  text        String?
+  attachments Json[]    @default([])
+  buttons     Json[]    @default([])
+  mailings    Mailing[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Tag {
+  id        String       @id @db.Uuid
+  projectId String       @db.Uuid
+  project   Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name      String
+  parentId  String?      @db.Uuid
+  parent    Tag?         @relation("parentAndChildren", fields: [parentId], references: [id], onDelete: SetNull)
+  children  Tag[]        @relation("parentAndChildren")
+  contacts  ContactTag[]
+  mailings  Mailing[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+model ContactTag {
+  contactId String  @db.Uuid
+  contact   Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  tagId     String  @db.Uuid
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([contactId, tagId])
+}
+
+model Field {
+  id           String         @id @db.Uuid
+  projectId    String         @db.Uuid
+  project      Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name         String
+  defaultValue String?
+  contacts     ContactField[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model ContactField {
+  contactId String  @db.Uuid
+  contact   Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  fieldId   String  @db.Uuid
+  field     Field   @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  value     String?
+
+  @@id([contactId, fieldId])
+}
+
+enum WebhookEvent {
+  ChatEvent
+  MessageEvent
+}
+
+model Webhook {
+  id        String         @id @db.Uuid
+  projectId String         @db.Uuid
+  project   Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  url       String
+  events    WebhookEvent[]
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+}
+
+enum IntegrationAdapter {
+  Amocrm
+  Bitrix
+}
+
+model Integration {
+  id         String             @id @db.Uuid
+  projectId  String             @db.Uuid
+  project    Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  adapter    IntegrationAdapter
+  externalId String
+  token      Json
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+}
+
+enum MailingStatus {
+  Disabled
+  Scheduled
+  Active
+  Finished
+}
+
+model Mailing {
+  id          String          @id @db.Uuid
+  projectId   String          @db.Uuid
+  project     Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name        String
+  channelId   String?         @db.Uuid
+  channel     Channel?        @relation(fields: [channelId], references: [id], onDelete: SetNull)
+  tagId       String?         @db.Uuid
+  tag         Tag?            @relation(fields: [tagId], references: [id], onDelete: SetNull)
+  hsmId       String?         @db.Uuid
+  hsm         Hsm?            @relation(fields: [hsmId], references: [id], onDelete: SetNull)
+  status      MailingStatus   @default(Disabled)
+  scheduledAt DateTime?
+  workers     MailingWorker[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+enum MailingWorkerStatus {
+  Scheduled
+  Active
+  Finished
+  Failed
+}
+
+model MailingWorker {
+  id           String              @id @db.Uuid
+  mailingId    String              @db.Uuid
+  mailing      Mailing             @relation(fields: [mailingId], references: [id], onDelete: Cascade)
+  contactId    String              @unique
+  contact      Contact             @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  messageId    String?             @unique @db.Uuid
+  message      Message?            @relation(fields: [messageId], references: [id], onDelete: SetNull)
+  scheduledAt  DateTime
+  status       MailingWorkerStatus @default(Scheduled)
+  failedReason String?
+  finishedAt   DateTime?
+}
+
+model BotTemplate {
+  id          String   @id @db.Uuid
+  name        String
+  description String
+  imageUrl    String
+  flow        Json
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum BotStatus {
+  Disabled
+  Active
+  Failed
+}
+
+model Bot {
+  id           String    @id @db.Uuid
+  projectId    String    @db.Uuid
+  project      Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name         String
+  flow         Json
+  status       BotStatus @default(Disabled)
+  failedReason String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
 
 model Subscription {
-  projectId Int              @id
-  wallet    Wallet           @relation(fields: [projectId], references: [projectId])
-  planId    Int
-  plan      SubscriptionPlan @relation(fields: [planId], references: [id])
-  expiresAt DateTime
+  id       String  @id @db.Uuid
+  name     String
+  currency String  @default("USD")
+  price    Decimal @db.Decimal(15, 6)
+  duration Int
 }
 
-model SubscriptionPlan {
-  id            Int            @id
-  name          String
-  price         Decimal        @db.Decimal(15, 6)
-  currency      String         @default("USD")
-  duration      Int
-  subscriptions Subscription[]
-}
+// и нужна привязка подписки к кошельку

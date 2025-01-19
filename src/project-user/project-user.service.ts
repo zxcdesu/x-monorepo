@@ -6,14 +6,18 @@ import { ProjectUserDto } from './dto';
 export class ProjectUserService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  findAll(projectId: number): Promise<ProjectUserDto[]> {
+  findAll(projectId: string): Promise<ProjectUserDto[]> {
     return this.prismaService.projectUser.findMany({
       where: {
         projectId,
       },
       include: {
         user: true,
-        roles: true,
+        roles: {
+          include: {
+            role: true,
+          },
+        },
       },
     });
   }

@@ -1,13 +1,6 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  SerializeOptions,
-  UseGuards,
-} from '@nestjs/common';
-import { AuthGuard, ProjectId } from 'src/auth';
-import { CreateSubscriptionDto, SubscriptionDto } from './dto';
+import { Controller, Get, SerializeOptions, UseGuards } from '@nestjs/common';
+import { AuthGuard } from 'src/auth';
+import { SubscriptionDto } from './dto';
 import { SubscriptionService } from './subscription.service';
 
 @Controller({
@@ -17,24 +10,12 @@ import { SubscriptionService } from './subscription.service';
 export class SubscriptionController {
   constructor(private readonly subscriptionService: SubscriptionService) {}
 
-  @Post()
+  @Get()
   @UseGuards(AuthGuard)
   @SerializeOptions({
     type: SubscriptionDto,
   })
-  create(
-    @ProjectId() projectId: number,
-    @Body() data: CreateSubscriptionDto,
-  ): Promise<SubscriptionDto> {
-    return this.subscriptionService.create(projectId, data);
-  }
-
-  @Get('@me')
-  @UseGuards(AuthGuard)
-  @SerializeOptions({
-    type: SubscriptionDto,
-  })
-  findMe(@ProjectId() projectId: number): Promise<SubscriptionDto> {
-    return this.subscriptionService.findOne(projectId);
+  findAll(): Promise<SubscriptionDto[]> {
+    return this.subscriptionService.findAll();
   }
 }

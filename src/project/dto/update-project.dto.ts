@@ -1,8 +1,7 @@
+import { PartialType } from '@nestjs/mapped-types';
 import { Prisma } from '@prisma/client';
-import { IsOptional, IsString } from 'class-validator';
+import { CreateProjectDto } from './create-project.dto';
 
-export class UpdateProjectDto implements Prisma.ProjectUpdateInput {
-  @IsOptional()
-  @IsString()
-  name?: string;
-}
+export class UpdateProjectDto
+  extends PartialType(CreateProjectDto)
+  implements Prisma.ProjectUncheckedUpdateInput {}

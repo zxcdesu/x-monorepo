@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: 14f5a9d5-4932-41b7-b7f4-3762eebd5e69
       POSTGRES_DB: x
     ports:
-      - '5432:5432'
+      - 5432:5432
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -17,7 +17,7 @@ services:
     image: redis:latest
     container_name: x-redis
     ports:
-      - '6379:6379'
+      - 6379:6379
     volumes:
       - redis_data:/data
 

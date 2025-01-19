@@ -1,15 +1,15 @@
-import { PaymentProvider, Prisma } from '@prisma/client';
+import { PaymentAdapter, Prisma } from '@prisma/client';
 import { IsDecimal, IsEnum } from 'class-validator';
 
 export class CreatePaymentDto
   implements
     Omit<
       Prisma.PaymentUncheckedCreateInput,
-      'projectId' | 'externalId' | 'status' | 'incomeAmount'
+      'id' | 'projectId' | 'externalId' | 'status' | 'incomeAmount'
     >
 {
-  @IsEnum(PaymentProvider)
-  provider: PaymentProvider;
+  @IsEnum(PaymentAdapter)
+  adapter: PaymentAdapter;
 
   @IsDecimal()
   amount: string;

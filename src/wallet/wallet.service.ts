@@ -6,7 +6,7 @@ import { CreateWalletDto, WalletDto } from './dto';
 export class WalletService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  create(projectId: number, data: CreateWalletDto): Promise<WalletDto> {
+  create(projectId: string, data: CreateWalletDto): Promise<WalletDto> {
     return this.prismaService.wallet.create({
       data: {
         projectId,
@@ -15,7 +15,7 @@ export class WalletService {
     });
   }
 
-  findOne(projectId: number): Promise<WalletDto> {
+  findOne(projectId: string): Promise<WalletDto> {
     return this.prismaService.wallet.findUniqueOrThrow({
       where: {
         projectId,

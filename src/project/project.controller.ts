@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Post,
   SerializeOptions,
@@ -27,7 +28,7 @@ export class ProjectController {
     type: ProjectDto,
   })
   create(
-    @UserId() userId: number,
+    @UserId() userId: string,
     @Body() data: CreateProjectDto,
   ): Promise<ProjectDto> {
     return this.projectService.create(userId, data);
@@ -36,8 +37,8 @@ export class ProjectController {
   @Get(':id')
   @UseGuards(AuthGuard)
   findOne(
-    @UserId() userId: number,
-    @Param('id', ParseIntPipe) id: number,
+    @UserId() userId: string,
+    @Param('id', ParseUUIDPipe) id: string,
   ): Promise<ProjectDto> {
     return this.projectService.findOne(userId, id);
   }
@@ -47,7 +48,7 @@ export class ProjectController {
   @SerializeOptions({
     type: ProjectDto,
   })
-  findAll(@UserId() userId: number): Promise<ProjectDto[]> {
+  findAll(@UserId() userId: string): Promise<ProjectDto[]> {
     return this.projectService.findAll(userId);
   }
 
@@ -57,8 +58,8 @@ export class ProjectController {
     type: ProjectDto,
   })
   update(
-    @UserId() userId: number,
-    @Param('id', ParseIntPipe) id: number,
+    @UserId() userId: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() data: UpdateProjectDto,
   ): Promise<ProjectDto> {
     return this.projectService.update(userId, id, data);
@@ -70,8 +71,8 @@ export class ProjectController {
     type: ProjectDto,
   })
   remove(
-    @UserId() userId: number,
-    @Param('id', ParseIntPipe) id: number,
+    @UserId() userId: string,
+    @Param('id', ParseIntPipe) id: string,
   ): Promise<ProjectDto> {
     return this.projectService.remove(userId, id);
   }

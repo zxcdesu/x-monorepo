@@ -15,7 +15,7 @@ export class ProjectUserController {
   @SerializeOptions({
     type: ProjectUserDto,
   })
-  findAll(@ProjectId() projectId: number): Promise<ProjectUserDto[]> {
+  findAll(@ProjectId() projectId: string): Promise<ProjectUserDto[]> {
     return this.projectUserService.findAll(projectId);
   }
 }
