@@ -14,7 +14,9 @@ export class SubscriptionDto implements Subscription {
   currency: string;
 
   @Expose()
-  @Transform(({ value }) => String(value), { toPlainOnly: true })
+  @Transform(({ value }) => String(value), {
+    toPlainOnly: true,
+  })
   price: Decimal;
 
   @Expose()

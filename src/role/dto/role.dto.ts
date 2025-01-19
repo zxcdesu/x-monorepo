@@ -19,10 +19,14 @@ export class RoleDto implements Role {
   permissions: Permission[];
 
   @Expose()
-  @Transform(({ value }) => String(value), { toPlainOnly: true })
+  @Transform(({ value }) => String(value), {
+    toPlainOnly: true,
+  })
   createdAt: Date;
 
   @Expose()
-  @Transform(({ value }) => String(value), { toPlainOnly: true })
+  @Transform(({ value }) => String(value), {
+    toPlainOnly: true,
+  })
   updatedAt: Date;
 }
