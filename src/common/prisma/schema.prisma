@@ -9,7 +9,7 @@ datasource db {
 
 model User {
   id            String         @id @db.Uuid
-  email         String         @unique
+  email         String         @unique @db.VarChar(254)
   name          String
   blocked       Boolean        @default(false)
   password      String
@@ -20,9 +20,9 @@ model User {
 }
 
 model Project {
-  id           String        @id @db.Uuid
+  id           String               @id @db.Uuid
   name         String
-  blocked      Boolean       @default(false)
+  blocked      Boolean              @default(false)
   users        ProjectUser[]
   roles        Role[]
   wallet       Wallet?
@@ -35,8 +35,9 @@ model Project {
   integrations Integration[]
   mailings     Mailing[]
   bots         Bot[]
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  subscription ProjectSubscription?
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
 }
 
 model ProjectUser {
@@ -78,8 +79,8 @@ model Role {
 model Wallet {
   projectId      String    @id @db.Uuid
   project        Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  country        String
-  currency       String    @default("USD")
+  country        String    @db.Char(3)
+  currency       String    @default("USD") @db.Char(3)
   currentBalance Decimal   @default(0) @db.Decimal(15, 6)
   payments       Payment[]
   createdAt      DateTime  @default(now())
@@ -141,7 +142,7 @@ enum ChannelStatus {
 
 model Channel {
   id           String         @id @db.Uuid
-  projectId    String
+  projectId    String         @db.Uuid
   project      Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
   name         String
   adapter      ChannelAdapter
@@ -159,7 +160,7 @@ model Channel {
 
 model Contact {
   id          String          @id @db.Uuid
-  projectId   String
+  projectId   String          @db.Uuid
   project     Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
   name        String
   description String          @default("")
@@ -330,7 +331,7 @@ model MailingWorker {
   id           String              @id @db.Uuid
   mailingId    String              @db.Uuid
   mailing      Mailing             @relation(fields: [mailingId], references: [id], onDelete: Cascade)
-  contactId    String              @unique
+  contactId    String              @unique @db.Uuid
   contact      Contact             @relation(fields: [contactId], references: [id], onDelete: Cascade)
   messageId    String?             @unique @db.Uuid
   message      Message?            @relation(fields: [messageId], references: [id], onDelete: SetNull)
@@ -369,11 +370,26 @@ model Bot {
 }
 
 model Subscription {
-  id       String  @id @db.Uuid
-  name     String
-  currency String  @default("USD")
-  price    Decimal @db.Decimal(15, 6)
-  duration Int
+  id            String                @id @db.Uuid
+  name          String
+  currency      String                @default("USD")
+  price         Decimal               @db.Decimal(15, 6)
+  duration      Int
+  subscriptions ProjectSubscription[]
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
 }
 
-// и нужна привязка подписки к кошельку
+model ProjectSubscription {
+  projectId      String       @id @db.Uuid
+  project        Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  subscriptionId String       @db.Uuid
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id])
+  expiresAt      DateTime
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model Transaction {
+  id String @id @db.Uuid
+}

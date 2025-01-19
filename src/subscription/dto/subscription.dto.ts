@@ -21,4 +21,10 @@ export class SubscriptionDto implements Subscription {
 
   @Expose()
   duration: number;
+
+  @Expose()
+  createdAt: Date;
+
+  @Expose()
+  updatedAt: Date;
 }
