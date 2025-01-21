@@ -1,10 +1,9 @@
-import { PaymentStatus } from '@prisma/client';
 import { plainToClass } from 'class-transformer';
 import { lastValueFrom, map } from 'rxjs';
 import { CreatePaymentDto, HandlePaymentDto, PaymentDto } from '../../dto';
 import { AbstractPaymentAdapter } from '../abstract-payment.adapter';
 import { YookassaPendingPaymentDto, YookassaWebhookDto } from './dto';
-import { YookassaWebhookEvent } from './enums';
+import { yookassaWebhookEventToPaymentType } from './utils';
 import { YookassaOptions } from './yookassa-options.interface';
 import {
   YOOKASSA_API_URL,
@@ -15,16 +14,6 @@ export class YookassaPaymentAdapter extends AbstractPaymentAdapter<
   YookassaOptions,
   YookassaWebhookDto
 > {
-  private static readonly eventToStatus: Record<
-    YookassaWebhookEvent,
-    PaymentStatus
-  > = {
-    [YookassaWebhookEvent.PaymentSucceeded]: PaymentStatus.Succeeded,
-    [YookassaWebhookEvent.PaymentWaitingForCapture]: PaymentStatus.Pending,
-    [YookassaWebhookEvent.PaymentCanceled]: PaymentStatus.Cancelled,
-    [YookassaWebhookEvent.RefundSucceeded]: PaymentStatus.Refunded,
-  };
-
   async create(
     data: CreatePaymentDto,
     payment: PaymentDto,
@@ -77,7 +66,7 @@ export class YookassaPaymentAdapter extends AbstractPaymentAdapter<
 
       await this.success(
         payment,
-        YookassaPaymentAdapter.eventToStatus[data.data.event],
+        yookassaWebhookEventToPaymentType(data.data.event),
         amount.value,
       );
     }

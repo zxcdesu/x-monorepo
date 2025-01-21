@@ -4,7 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PaymentAdapter } from '@prisma/client';
 import { JwtOptionsFactoryService } from 'src/common/jwt';
 import { PrismaModule } from 'src/common/prisma';
-import { PaymentAdapterModule } from './payment-provider';
+import { PaymentAdapterModule } from './payment-adapter';
 import { PaymentController } from './payment.controller';
 import { PaymentService } from './payment.service';
 

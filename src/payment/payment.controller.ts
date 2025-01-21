@@ -10,7 +10,7 @@ import {
 import { PaymentAdapter } from '@prisma/client';
 import { AuthGuard, ProjectId } from 'src/auth';
 import { CreatePaymentDto, PaymentDto } from './dto';
-import { YookassaGuard, YookassaWebhookDto } from './payment-provider';
+import { YookassaGuard, YookassaWebhookDto } from './payment-adapter';
 import { PaymentGuard } from './payment.guard';
 import { PaymentService } from './payment.service';
 

@@ -9,7 +9,7 @@ import { PaymentAdapterRepository } from './payment-adapter.repository';
     HttpModule.register({
       headers: {
         'User-Agent':
-          'Mozilla/5.0 (compatible; PaymentProviderModule/1.0; +https://en.wikipedia.org/wiki/Webhook)',
+          'Mozilla/5.0 (compatible; PaymentAdapterModule/1.0; +https://en.wikipedia.org/wiki/Webhook)',
       },
     }),
     PrismaModule,
