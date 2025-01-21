@@ -7,8 +7,8 @@ import {
   SerializeOptions,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { UserId } from './decorators';
-import { SignInByEmailAndPasswordDto, SignInProjectDto, TokenDto } from './dto';
+import { ProjectId, UserId } from './decorators';
+import { SignInByEmailAndPasswordDto, TokenDto } from './dto';
 
 @Controller({
   path: ['auth'],
@@ -28,15 +28,15 @@ export class AuthController {
     return this.authService.signInByEmailAndPassword(data);
   }
 
-  @Post()
+  @Post('projects/:id/sign-in')
   @HttpCode(HttpStatus.OK)
   @SerializeOptions({
     type: TokenDto,
   })
   signInProject(
-    @UserId() userId: number,
-    @Body() data: SignInProjectDto,
+    @UserId() userId: string,
+    @ProjectId() projectId: string,
   ): Promise<TokenDto> {
-    return this.authService.signInProject(userId, data);
+    return this.authService.signInProject(userId, projectId);
   }
 }
