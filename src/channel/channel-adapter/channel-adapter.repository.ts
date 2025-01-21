@@ -16,17 +16,17 @@ import { WebappChannelAdapter } from './webapp';
 export class ChannelAdapterRepository
   implements Record<ChannelAdapter, typeof AbstractChannelAdapter<unknown>>
 {
-  [ChannelAdapter.Gupshup] = GupshupChannelAdapter;
+  readonly [ChannelAdapter.Gupshup] = GupshupChannelAdapter;
 
-  [ChannelAdapter.Instagram] = InstagramChannelAdapter;
+  readonly [ChannelAdapter.Instagram] = InstagramChannelAdapter;
 
-  [ChannelAdapter.Telegram] = TelegramChannelAdapter;
+  readonly [ChannelAdapter.Telegram] = TelegramChannelAdapter;
 
-  [ChannelAdapter.Viber] = ViberChannelAdapter;
+  readonly [ChannelAdapter.Viber] = ViberChannelAdapter;
 
-  [ChannelAdapter.Vkontakte] = VkontakteChannelAdapter;
+  readonly [ChannelAdapter.Vkontakte] = VkontakteChannelAdapter;
 
-  [ChannelAdapter.Webapp] = WebappChannelAdapter;
+  readonly [ChannelAdapter.Webapp] = WebappChannelAdapter;
 
   constructor(
     @Inject(MODULE_OPTIONS_TOKEN)
